@@ -20,16 +20,17 @@
             </a>
 
             {{-- SEARCH BAR --}}
-            <div class="flex-1 mx-12">
+            <form action="{{ route('search') }}" method="GET" class="flex-1 mx-12">
                 <div class="border-2 border-black flex items-center px-5 py-3 bg-white">
                     <input
                         type="text"
-                        placeholder="What are you looking for?"
+                        name="q"
+                        placeholder="Cari skincare..."
                         class="w-full outline-none bg-transparent text-gray-500 text-base"
                     >
-                    <span class="text-2xl">🔍</span>
+                    <button type="submit" class="text-2xl">🔍</button>
                 </div>
-            </div>
+            </form>
 
             {{-- CART + PROFILE --}}
             <div class="flex items-center gap-6">
