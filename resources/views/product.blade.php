@@ -104,9 +104,13 @@
                         </div>
                     </div>
 
-                    <button class="w-full bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600">
-                        Tambah ke Keranjang
-                    </button>
+                    <form action="{{ route('keranjang.add') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product['id'] }}">
+                        <button type="submit" class="w-full bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600">
+                            Tambah ke Keranjang
+                        </button>
+                    </form>
                 </div>
 
             </div>

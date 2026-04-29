@@ -103,10 +103,10 @@
 
             @php
                 $products = [
-                    ['id'=>1,'name'=>'Hydrating Serum','price'=>'Rp 89.000','emoji'=>'🧴'],
-                    ['id'=>2,'name'=>'Toner','price'=>'Rp 75.000','emoji'=>'💧'],
-                    ['id'=>3,'name'=>'Sunscreen','price'=>'Rp 99.000','emoji'=>'☀️'],
-                    ['id'=>4,'name'=>'Facial Wash','price'=>'Rp 55.000','emoji'=>'🫧'],
+                    ['id'=>1,'name'=>'Hydrating Serum','price'=>89000,'emoji'=>'🧴'],
+                    ['id'=>2,'name'=>'Toner','price'=>75000,'emoji'=>'💧'],
+                    ['id'=>3,'name'=>'Sunscreen','price'=>99000,'emoji'=>'☀️'],
+                    ['id'=>4,'name'=>'Facial Wash','price'=>55000,'emoji'=>'🫧'],
                 ];
             @endphp
 
@@ -120,7 +120,7 @@
 
                         <div class="p-4">
                             <h3 class="font-semibold">{{ $p['name'] }}</h3>
-                            <p class="text-pink-600 font-bold mb-3">{{ $p['price'] }}</p>
+                            <p class="text-pink-600 font-bold mb-3">Rp {{ number_format($p['price'], 0, ',', '.') }}</p>
 
                             {{-- DETAIL PRODUK --}}
                             <a href="{{ route('product', $p['id']) }}"
@@ -128,9 +128,13 @@
                                 Lihat Detail
                             </a>
 
-                            <button class="w-full bg-pink-500 text-white py-2 rounded-lg">
-                                Tambah ke Keranjang
-                            </button>
+                            <form action="{{ route('keranjang.add') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $p['id'] }}">
+                                <button type="submit" class="w-full bg-pink-500 text-white py-2 rounded-lg">
+                                    Tambah ke Keranjang
+                                </button>
+                            </form>
                         </div>
 
                     </div>

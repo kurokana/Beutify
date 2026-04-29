@@ -61,6 +61,18 @@
     {{-- KERANJANG --}}
     <main class="max-w-7xl mx-auto px-6 py-10">
 
+        @if (session('success'))
+            <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
+
         {{-- BACK + TITLE --}}
         <div class="flex items-center gap-4 mb-8">
 
@@ -82,67 +94,52 @@
 
         </div>
 
-        @php
-            $cartItems = [
-                [
-                    'name' => 'Hydrating Serum',
-                    'variant' => 'Serum wajah untuk kulit lembap',
-                    'price' => 89000,
-                    'qty' => 1,
-                    'emoji' => '🧴'
-                ],
-                [
-                    'name' => 'Daily Sunscreen SPF 50',
-                    'variant' => 'Sunscreen ringan untuk harian',
-                    'price' => 99000,
-                    'qty' => 2,
-                    'emoji' => '☀️'
-                ],
-                [
-                    'name' => 'Gentle Facial Wash',
-                    'variant' => 'Pembersih wajah lembut',
-                    'price' => 55000,
-                    'qty' => 1,
-                    'emoji' => '🫧'
-                ],
-            ];
-
-            $subtotal = collect($cartItems)->sum(fn($item) => $item['price'] * $item['qty']);
-            $shipping = 15000;
-            $total = $subtotal + $shipping;
-        @endphp
-
         <div class="grid lg:grid-cols-3 gap-8">
 
             {{-- LIST PRODUK --}}
             <section class="lg:col-span-2 space-y-5">
-                @foreach ($cartItems as $item)
+                @forelse ($cartItems as $item)
                     <div class="bg-white border rounded-2xl p-5 flex gap-5 items-center shadow-sm">
-
-                        <div class="w-28 h-28 bg-pink-50 rounded-xl flex items-center justify-center text-5xl">
+                        <div class="w-24 h-24 bg-pink-50 rounded-xl flex items-center justify-center text-4xl">
                             {{ $item['emoji'] }}
                         </div>
 
                         <div class="flex-1">
                             <h2 class="text-xl font-bold">{{ $item['name'] }}</h2>
                             <p class="text-gray-500 mt-1">{{ $item['variant'] }}</p>
-                            <p class="text-pink-600 font-bold mt-3">
-                                Rp {{ number_format($item['price'], 0, ',', '.') }}
-                            </p>
+                            <p class="text-pink-600 font-bold mt-3">Rp {{ number_format($item['price'], 0, ',', '.') }}</p>
                         </div>
 
-                        <div class="flex items-center gap-3">
-                            <button class="w-9 h-9 border rounded-full text-lg hover:bg-gray-100">-</button>
-                            <span class="font-semibold">{{ $item['qty'] }}</span>
-                            <button class="w-9 h-9 border rounded-full text-lg hover:bg-gray-100">+</button>
-                        </div>
+                        <form action="{{ route('keranjang.update', $item['id']) }}" method="POST" class="flex items-center gap-2">
+                            @csrf
+                            @method('PATCH')
+                            <input
+                                type="number"
+                                name="qty"
+                                min="1"
+                                value="{{ $item['qty'] }}"
+                                class="w-16 border rounded-lg px-2 py-1 text-center"
+                            >
+                            <button type="submit" class="px-3 py-1 border rounded-lg hover:bg-gray-100 transition">
+                                Update
+                            </button>
+                        </form>
 
-                        <button class="text-red-500 font-semibold hover:underline">
-                            Hapus
-                        </button>
-
+                        <form action="{{ route('keranjang.remove', $item['id']) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 font-semibold hover:underline">
+                                Hapus
+                            </button>
+                        </form>
                     </div>
-                @endforeach
+                @empty
+                    <div class="bg-white border rounded-2xl p-10 text-center shadow-sm">
+                        <div class="text-5xl mb-3">🛒</div>
+                        <h2 class="text-2xl font-bold mb-2">Keranjang masih kosong</h2>
+                        <p class="text-gray-500">Yuk pilih produk dulu untuk melanjutkan checkout.</p>
+                    </div>
+                @endforelse
             </section>
 
             {{-- RINGKASAN --}}
@@ -168,9 +165,15 @@
                     </div>
                 </div>
 
-                <a href="{{ route('checkout') }}" class="block w-full mt-6 bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition text-center">
-                    Checkout
-                </a>
+                @if (count($cartItems) > 0)
+                    <a href="{{ route('checkout') }}" class="block w-full mt-6 bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition text-center">
+                        Checkout
+                    </a>
+                @else
+                    <button type="button" class="block w-full mt-6 bg-gray-300 text-gray-600 py-3 rounded-lg font-semibold text-center cursor-not-allowed" disabled>
+                        Checkout
+                    </button>
+                @endif
 
                 <a href="{{ route('dashboard') }}" class="block text-center mt-4 text-pink-600 font-semibold hover:underline">
                     Lanjut Belanja
