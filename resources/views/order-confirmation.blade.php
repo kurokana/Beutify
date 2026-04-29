@@ -16,27 +16,40 @@
             <div class="space-y-3 border-b pb-5 mb-5">
                 <div class="flex justify-between">
                     <span>Nama Penerima</span>
-                    <span class="font-semibold">{{ $order['customer']['recipient_name'] }}</span>
+                    <span class="font-semibold">{{ $order->recipient_name }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span>Kota</span>
-                    <span class="font-semibold">{{ $order['customer']['city'] }}</span>
+                    <span class="font-semibold">{{ $order->city }}</span>
                 </div>
+
+                <div class="pt-2">
+                    <p class="font-semibold mb-2">Item Pesanan</p>
+                    <div class="space-y-2">
+                        @foreach ($order->items as $item)
+                            <div class="flex justify-between text-sm text-gray-700">
+                                <span>{{ $item->emoji }} {{ $item->name }} x{{ $item->qty }}</span>
+                                <span>Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
                 <div class="flex justify-between">
                     <span>Subtotal</span>
-                    <span>Rp {{ number_format($order['summary']['subtotal'], 0, ',', '.') }}</span>
+                    <span>Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span>Pajak</span>
-                    <span>Rp {{ number_format($order['summary']['tax'], 0, ',', '.') }}</span>
+                    <span>Rp {{ number_format($order->tax, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span>Ongkir</span>
-                    <span>Rp {{ number_format($order['summary']['shipping'], 0, ',', '.') }}</span>
+                    <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between text-xl font-bold">
                     <span>Total</span>
-                    <span>Rp {{ number_format($order['summary']['total'], 0, ',', '.') }}</span>
+                    <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
                 </div>
             </div>
 
