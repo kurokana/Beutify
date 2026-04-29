@@ -261,11 +261,26 @@
                 <h2 class="text-2xl font-bold mb-5">📦 Ringkasan Pesanan</h2>
 
                 {{-- PRODUK --}}
-                <div class="mb-5 pb-5 border-b space-y-3">
-                    @foreach ($cartItems as $item)
-                        <div class="flex justify-between text-sm">
-                            <span>{{ $item['name'] }} (x{{ $item['qty'] }})</span>
-                            <span class="font-semibold">Rp {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}</span>
+                <div class="mb-5 pb-5 border-b space-y-4" id="cartItems">
+                    @foreach ($cartItems as $index => $item)
+                        <div class="cart-item bg-gray-50 p-3 rounded-lg" data-index="{{ $index }}" data-price="{{ $item['price'] }}">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm">{{ $item['emoji'] }} {{ $item['name'] }}</p>
+                                    <p class="text-xs text-gray-500">{{ $item['variant'] }}</p>
+                                    <p class="text-sm font-semibold mt-1">Rp {{ number_format($item['price'], 0, ',', '.') }}</p>
+                                </div>
+                                <button type="button" class="delete-btn text-red-500 hover:text-red-700 text-lg font-bold" title="Hapus">✕</button>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 bg-white border rounded-lg">
+                                    <button type="button" class="qty-decrease px-3 py-1 hover:bg-pink-100 transition">−</button>
+                                    <input type="number" class="qty-input w-10 text-center border-0 focus:outline-none bg-white" value="{{ $item['qty'] }}" min="1" readonly>
+                                    <button type="button" class="qty-increase px-3 py-1 hover:bg-pink-100 transition">+</button>
+                                </div>
+                                <span class="item-total font-semibold text-sm">Rp {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}</span>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -274,24 +289,24 @@
                 <div class="space-y-3 text-gray-700 mb-5 pb-5 border-b">
                     <div class="flex justify-between">
                         <span>Subtotal</span>
-                        <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                        <span id="subtotalAmount">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
 
                     <div class="flex justify-between">
                         <span>Pajak (10%)</span>
-                        <span>Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                        <span id="taxAmount">Rp {{ number_format($tax, 0, ',', '.') }}</span>
                     </div>
 
                     <div class="flex justify-between">
                         <span>Ongkir</span>
-                        <span>Rp {{ number_format($shipping, 0, ',', '.') }}</span>
+                        <span id="shippingAmount">Rp {{ number_format($shipping, 0, ',', '.') }}</span>
                     </div>
                 </div>
 
                 {{-- TOTAL --}}
                 <div class="flex justify-between text-2xl font-bold mb-6">
                     <span>Total</span>
-                    <span class="text-pink-500">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    <span class="text-pink-500" id="totalAmount">Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
 
                 {{-- BUTTON --}}
@@ -309,4 +324,75 @@
     </main>
 
 </body>
-</html>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const SHIPPING_COST = 15000;
+    
+    function updateCalculations() {
+        let subtotal = 0;
+        
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const qty = parseInt(item.querySelector('.qty-input').value);
+            const price = parseFloat(item.dataset.price);
+            const itemTotal = qty * price;
+            
+            item.querySelector('.item-total').textContent = 
+                'Rp ' + itemTotal.toLocaleString('id-ID', {style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0});
+            
+            subtotal += itemTotal;
+        });
+        
+        const tax = Math.round(subtotal * 0.1);
+        const total = subtotal + SHIPPING_COST + tax;
+        
+        document.getElementById('subtotalAmount').textContent = 
+            'Rp ' + subtotal.toLocaleString('id-ID', {style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0});
+        document.getElementById('taxAmount').textContent = 
+            'Rp ' + tax.toLocaleString('id-ID', {style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0});
+        document.getElementById('shippingAmount').textContent = 
+            'Rp ' + SHIPPING_COST.toLocaleString('id-ID', {style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0});
+        document.getElementById('totalAmount').textContent = 
+            'Rp ' + total.toLocaleString('id-ID', {style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0});
+    }
+    
+    // Quantity Increase
+    document.querySelectorAll('.qty-increase').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const input = this.closest('.cart-item').querySelector('.qty-input');
+            input.value = parseInt(input.value) + 1;
+            updateCalculations();
+        });
+    });
+    
+    // Quantity Decrease
+    document.querySelectorAll('.qty-decrease').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const input = this.closest('.cart-item').querySelector('.qty-input');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+            updateCalculations();
+        });
+    });
+    
+    // Delete Item
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Hapus item ini dari keranjang?')) {
+                this.closest('.cart-item').remove();
+                
+                if (document.querySelectorAll('.cart-item').length === 0) {
+                    document.getElementById('cartItems').innerHTML = 
+                        '<p class="text-center text-gray-500 py-4">Keranjang kosong</p>';
+                }
+                
+                updateCalculations();
+            }
+        });
+    });
+});
+</script>
