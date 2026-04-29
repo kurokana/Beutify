@@ -20,16 +20,17 @@
             </a>
 
             {{-- SEARCH BAR --}}
-            <div class="flex-1 mx-12">
+            <form action="{{ route('search') }}" method="GET" class="flex-1 mx-12">
                 <div class="border-2 border-black flex items-center px-5 py-3 bg-white">
                     <input
                         type="text"
-                        placeholder="What are you looking for?"
+                        name="q"
+                        placeholder="Cari skincare..."
                         class="w-full outline-none bg-transparent text-gray-500 text-base"
                     >
-                    <span class="text-2xl">🔍</span>
+                    <button type="submit" class="text-2xl">🔍</button>
                 </div>
-            </div>
+            </form>
 
             {{-- CART + PROFILE --}}
             <div class="flex items-center gap-6">
@@ -167,9 +168,9 @@
                     </div>
                 </div>
 
-                <button class="w-full mt-6 bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition">
+                <a href="{{ route('checkout') }}" class="block w-full mt-6 bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition text-center">
                     Checkout
-                </button>
+                </a>
 
                 <a href="{{ route('dashboard') }}" class="block text-center mt-4 text-pink-600 font-semibold hover:underline">
                     Lanjut Belanja
