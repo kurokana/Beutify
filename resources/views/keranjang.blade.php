@@ -167,9 +167,9 @@
                     </div>
                 </div>
 
-                <button class="w-full mt-6 bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition">
+                <a href="{{ route('checkout') }}" class="block w-full mt-6 bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition text-center">
                     Checkout
-                </button>
+                </a>
 
                 <a href="{{ route('dashboard') }}" class="block text-center mt-4 text-pink-600 font-semibold hover:underline">
                     Lanjut Belanja

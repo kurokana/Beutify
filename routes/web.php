@@ -16,6 +16,30 @@ Route::get('/keranjang', function () {
     return view('keranjang');
 })->middleware(['auth', 'verified'])->name('keranjang');
 
+Route::get('/checkout', function () {
+    return view('checkout');
+})->middleware(['auth', 'verified'])->name('checkout');
+
+Route::post('/checkout', function (Request $request) {
+    // Validasi input
+    $validated = $request->validate([
+        'recipient_name' => 'required|string|max:255',
+        'phone_number' => 'required|string|max:20',
+        'address' => 'required|string',
+        'city' => 'required|string|max:100',
+        'postal_code' => 'required|string|max:10',
+        'shipping_method' => 'required|in:reguler,express,same_day',
+        'payment_method' => 'required|in:bank_transfer,e_wallet,credit_card,cod',
+        'notes' => 'nullable|string',
+    ]);
+
+    // Simpan order (untuk sementara ke session, nanti bisa disimpan ke database)
+    session(['checkout_data' => $validated]);
+
+    // Redirect ke halaman konfirmasi atau pembayaran
+    return redirect()->route('order.confirmation')->with('success', 'Pesanan berhasil diproses! Silakan lanjutkan dengan pembayaran.');
+})->middleware(['auth', 'verified'])->name('checkout.process');
+
 Route::get('/search', function (Request $request) {
     $query = strtolower($request->q ?? '');
 
